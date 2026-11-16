@@ -2,12 +2,7 @@ import torch
 import torch.nn as nn
 
 class SCE(nn.Module):
-    """
-    修复版Coordinate Attention
-    - 恢复平均池化（更适合小目标）
-    - 去除多余插值
-    - 使用SiLU保持与YOLO一致
-    """
+
     def __init__(self, c1, c2=None, reduction=16):
         super().__init__()
         c2 = c2 or c1
@@ -19,7 +14,7 @@ class SCE(nn.Module):
         
         self.conv1 = nn.Conv2d(c1, mip, 1, bias=False)
         self.bn1 = nn.BatchNorm2d(mip)
-        self.act = nn.SiLU(inplace=True)  # 与YOLO保持一致
+        self.act = nn.SiLU(inplace=True)  # 
         
         self.conv_h = nn.Conv2d(mip, c2, 1, bias=False)
         self.conv_w = nn.Conv2d(mip, c2, 1, bias=False)
@@ -40,7 +35,7 @@ class SCE(nn.Module):
         x_h, x_w = torch.split(y, [h, w], dim=2)
         x_w = x_w.permute(0, 1, 3, 2)
         
-        # 生成注意力（直接广播，不需要插值）
+        # 生成注意力
         a_h = self.conv_h(x_h).sigmoid()  # [B, C, H, 1]
         a_w = self.conv_w(x_w).sigmoid()  # [B, C, 1, W]
         
