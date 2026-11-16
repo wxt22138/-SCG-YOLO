@@ -4,14 +4,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class CSREnhanced(nn.Module):
-    """
-    完全保留你原有逻辑，仅确保branch属性存在
-    """
+
     def __init__(self, channels, e_lambda_base=1e-5, reduction=4, branch='cls'):
         super(CSREnhanced, self).__init__()
         self.e_lambda_base = e_lambda_base
         self.channels = channels
-        self.branch = branch  # 保留原有定义
+        self.branch = branch  
         
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
@@ -25,7 +23,7 @@ class CSREnhanced(nn.Module):
         self.alpha = nn.Parameter(torch.tensor(0.1))  
 
     def forward(self, x, is_cls_branch=False):
-        # 完全保留原有forward逻辑
+
         if (self.branch == 'cls' and not is_cls_branch) or (self.branch == 'reg' and is_cls_branch):
             return x
         
@@ -49,7 +47,7 @@ class CSREnhanced(nn.Module):
         
         return x_out
 
-# 兼容层：仅添加branch属性兜底，无任何逻辑改动
+# 仅添加branch属性兜底
 class CSR(CSREnhanced):
     def __init__(self, e_lambda=1e-5, branch='cls'):
         super().__init__(channels=0, e_lambda_base=e_lambda, branch=branch)
